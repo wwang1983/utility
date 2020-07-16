@@ -1,5 +1,8 @@
 #!/usr/bin python3
 # coding: utf-8
+"""
+build a c++ cmake project
+"""
 
 import argparse
 import logging
@@ -18,18 +21,17 @@ class ProjectBuilder():
 
     def __parse_arg(self):
         parser = argparse.ArgumentParser()
-        parser.description = 'please enter project name ...'
         parser.add_argument("-n", "--name", required=True, help="project name", dest="project_name")
         args = parser.parse_args()
         self.project_name = args.project_name
         logging.info("project_name is %s", self.project_name)
 
     def version(self):
-        """ return the version of the class """
+        """ return the version of the class. """
         return "{}.{}.{}".format(self.major, self.minor, self.patch)
 
     def fill_cmake_content(self, file_handler):
-        """ generate CMakeLists.txt contents """
+        """ generate CMakeLists.txt contents. """
         content = r"""
 cmake_minimum_required(VERSION 3.5)
 project(PROJECT_NAME VERSION 0.1.0)
@@ -87,12 +89,17 @@ endif()
             os.makedirs(self.project_name + os.sep + folder)
             with open(self.project_name + os.sep + folder + os.sep + "CMakeLists.txt", 'w') as cmake_file:
                 pass
-        for folder in ['inc', 'build', 'cmake']:
+        for folder in ['inc', 'cmake']:
             os.makedirs(self.project_name + os.sep + folder)
+        for folder in ['build']:
+            os.makedirs(self.project_name + os.sep + folder)
+            with open(self.project_name + os.sep + folder + os.sep + ".gitignore", 'w') as git_ignore_file:
+                content = """*\n!.gitignore\n"""
+                git_ignore_file.write(content)
 
 
 if __name__ == "__main__":
-    instance = ProjectBuilder()
-    print("project name : %s"%(instance.project_name))
-    print("version : %s"%(instance.version()))
-    instance.build_prject()
+    INSTANCE = ProjectBuilder()
+    print("project name : %s"%(INSTANCE.project_name))
+    print("version : %s"%(INSTANCE.version()))
+    INSTANCE.build_prject()
