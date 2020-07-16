@@ -7,7 +7,8 @@ build a c++ cmake project
 import argparse
 import logging
 import os
-
+import glob
+import shutil
 
 class ProjectBuilder():
     """ build a c++ cmake project """
@@ -33,28 +34,33 @@ class ProjectBuilder():
     def fill_cmake_content(self, file_handler):
         """ generate CMakeLists.txt contents. """
         content = r"""
-cmake_minimum_required(VERSION 3.5)
-project(PROJECT_NAME VERSION 0.1.0)
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# Options
-option(BUILD_TESTS "Build test executable" OFF)
-option(GEN_DOCS "Generate documentation" ON)
-option(ENABLE_COVERAGE "Enable code coverage" OFF)
-
-
+cmake_minimum_required(VERSION 3.14)
+# set variable before project() to make it valid for submodules
+set(CMAKE_BUILD_TYPE Debug)
 #set library output path
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 #set executable output path
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+project(PROJECT_NAME VERSION 0.1.0)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# gtest submodule
+include(cmake/get_gtest.cmake)
+
+# Options
+option(BUILD_TESTS "Build test executable" OFF)
+option(GEN_DOCS "Generate documentation" OFF)
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
+
 # Set global property (all targets are impacted)
 #set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wnon-virtual-dtor -pedantic")
+
 
 add_subdirectory(src)
 
@@ -97,6 +103,9 @@ endif()
                 content = """*\n!.gitignore\n"""
                 git_ignore_file.write(content)
 
+        cmake_files = [cmake_file for cmake_file in glob.glob("*.cmake")]
+        for file in cmake_files:
+            shutil.copy(file, self.project_name + os.sep + "cmake" + os.sep)
 
 if __name__ == "__main__":
     INSTANCE = ProjectBuilder()
