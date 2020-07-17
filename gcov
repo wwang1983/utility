@@ -1,0 +1,3 @@
+#!/bin/bash 
+lcov -d ./uid -t 'cov' -o ./cov.info -b . -c
+genhtml -o ./cov_result ./cov.info

@@ -142,4 +142,8 @@ CMAKE_MODULE_FILES = glob.glob(SCRIPT_PATH + os.sep + "*.cmake")
 for cmake_file in CMAKE_MODULE_FILES:
     shutil.copy(cmake_file, PROJECT_PATH + os.sep + "cmake" + os.sep)
 
+# copy gcov to cmake directory
+if os.path.exists(SCRIPT_PATH + os.sep + "gcov"):
+    shutil.copy(SCRIPT_PATH + os.sep + "gcov", PROJECT_PATH + os.sep + "cmake" + os.sep)
+
 print("make project %s succeed!"%PROJECT_NAME)
