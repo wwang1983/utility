@@ -121,7 +121,7 @@ with open(PROJECT_PATH + os.sep + 'src' + os.sep + "CMakeLists.txt", 'w') as cma
 TEST_CMAKE_CONTENT = r"""
 set(DEP_LIBS gtest_main gtest pthread)
 
-file(GLOB files "ut_*.cc")
+file(GLOB files "*.cc")
 foreach(file ${files})
     get_filename_component(testcase ${file} NAME_WE)
     add_executable(${testcase} ${file})
