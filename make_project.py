@@ -5,7 +5,8 @@ build a c++ cmake project
 
 arguments:
 name -- the name of the project
-path -- the directory of the project
+path -- optional, the directory of the project, could be relative or absolute,
+default value is ../
 
 after running this script, there would be a new C++ cmake project
 under path directory.
@@ -16,7 +17,7 @@ import os
 import glob
 import shutil
 
-VERSION = "0.1.0"
+VERSION = "1.0.0"
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-n", "--name", required=True, help="project name", dest="name")
