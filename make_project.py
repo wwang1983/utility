@@ -21,10 +21,14 @@ VERSION = "1.0.0"
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-n", "--name", required=True, help="project name", dest="name")
-PARSER.add_argument("-p", "--path", required=False, help="project path", default='../', dest="path")
+PARSER.add_argument("-p", "--path", required=False, help="project path", default='.', dest="path")
+PARSER.add_argument("-o", "--option", required=False, help="project option", default='lib', dest="path")
 ARGS = PARSER.parse_args()
 PROJECT_NAME = ARGS.name
 PROJECT_PATH = ARGS.path
+PROJECT_OPTION = 'lib'
+if 'option' in ARGS:
+    PROJECT_OPTION = ARGS.option
 
 SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -33,11 +37,22 @@ if not os.path.isabs(PROJECT_PATH):
 
 PROJECT_PATH = PROJECT_PATH + os.sep + PROJECT_NAME
 
-print("project name is : %s, path is : %s"%(PROJECT_NAME, PROJECT_PATH))
+print("project name is : %s, path is : %s, option is %s"%(PROJECT_NAME, PROJECT_PATH, PROJECT_OPTION))
 
 if os.path.exists(PROJECT_PATH):
     print("error, project directory %s already exists"%(PROJECT_PATH))
     exit()
+
+PROJECT_SUB_DIRS = ['inc', 'build', 'src', 'test']
+HAS_CMAKE_DIR = False
+if PROJECT_OPTION == 'app':
+    PROJECT_SUB_DIRS = ['inc', 'build', 'src', 'test', 'app']
+elif PROJECT_OPTION == 'app_cov':
+    PROJECT_SUB_DIRS = ['inc', 'build', 'src', 'test', 'app', 'cmake']
+    HAS_CMAKE_DIR = True
+elif PROJECT_OPTION == 'lib_cov':
+    PROJECT_SUB_DIRS = ['inc', 'build', 'src', 'test', 'cmake']
+    HAS_CMAKE_DIR = True
 
 ROOT_CMAKE_CONTENT = r"""
 cmake_minimum_required(VERSION 3.14)
@@ -61,6 +76,8 @@ include(cmake/get_gtest.cmake)
 option(BUILD_TESTS "Build test executable" OFF)
 option(GEN_DOCS "Generate documentation" OFF)
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
+#print verbose command
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # Set global property (all targets are impacted)
 #set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
@@ -68,7 +85,7 @@ option(ENABLE_COVERAGE "Enable code coverage" OFF)
 # project-wide cpp flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wnon-virtual-dtor -pedantic")
 # project-wide include directory
-include_directories(./include)
+include_directories(./inc)
 
 #add_subdirectory(src)
 #add_subdirectory(app)
@@ -96,8 +113,10 @@ with open(PROJECT_PATH + os.sep + "CMakeLists.txt", 'w') as cmake_file:
     cmake_file.write(ROOT_CMAKE_CONTENT)
 
 # make sub directories
-for folder in ['include', 'build', 'cmake', 'src', 'test', 'app']:
+for folder in PROJECT_SUB_DIRS:
     os.makedirs(PROJECT_PATH + os.sep + folder)
+    if folder == 'inc':
+        os.makedirs(PROJECT_PATH + os.sep + folder + os.sep + PROJECT_NAME)
 
 # write .gitignore under build directory
 with open(PROJECT_PATH + os.sep + 'build' + os.sep + ".gitignore", 'w') as git_ignore_file:
@@ -119,6 +138,7 @@ target_link_libraries(${lib} ${DEP_LIBS})
 with open(PROJECT_PATH + os.sep + 'src' + os.sep + "CMakeLists.txt", 'w') as cmake_file:
     cmake_file.write(LIB_CMAKE_CONTENT)
 
+# write CMakeLists.txt under test directory
 TEST_CMAKE_CONTENT = r"""
 set(DEP_LIBS gtest_main gtest pthread)
 
@@ -137,13 +157,14 @@ endforeach()
 with open(PROJECT_PATH + os.sep + 'test' + os.sep + "CMakeLists.txt", 'w') as cmake_file:
     cmake_file.write(TEST_CMAKE_CONTENT)
 
-# copy *.cmake files to cmake directory
-CMAKE_MODULE_FILES = glob.glob(SCRIPT_PATH + os.sep + "*.cmake")
-for cmake_file in CMAKE_MODULE_FILES:
-    shutil.copy(cmake_file, PROJECT_PATH + os.sep + "cmake" + os.sep)
+if HAS_CMAKE_DIR:
+    # copy *.cmake files to cmake directory
+    CMAKE_MODULE_FILES = glob.glob(SCRIPT_PATH + os.sep + "*.cmake")
+    for cmake_file in CMAKE_MODULE_FILES:
+        shutil.copy(cmake_file, PROJECT_PATH + os.sep + "cmake" + os.sep)
 
-# copy gcov to cmake directory
-if os.path.exists(SCRIPT_PATH + os.sep + "gcov"):
-    shutil.copy(SCRIPT_PATH + os.sep + "gcov", PROJECT_PATH + os.sep + "cmake" + os.sep)
+    # copy gcov to cmake directory
+    if os.path.exists(SCRIPT_PATH + os.sep + "gcov"):
+        shutil.copy(SCRIPT_PATH + os.sep + "gcov", PROJECT_PATH + os.sep + "cmake" + os.sep)
 
 print("make project %s succeed!"%PROJECT_NAME)
