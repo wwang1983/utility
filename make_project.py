@@ -70,13 +70,13 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # gtest submodule
-include(cmake/get_gtest.cmake)
+# include(cmake/get_gtest.cmake)
 
 # Options
 option(BUILD_TESTS "Build test executable" OFF)
 option(GEN_DOCS "Generate documentation" OFF)
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
-#print verbose command
+# print verbose command
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # Set global property (all targets are impacted)
