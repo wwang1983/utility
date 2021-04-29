@@ -78,6 +78,9 @@ def write_files(project_name, root_path, sub_paths):
         cmake_file.write(ROOT_CMAKE_CONTENT.replace("PROJECT_NAME", project_name))
     # copy .clang_format to project root path
     shutil.copy(script_path + os.sep + ".clang-format", root_path)
+    # write .gitignore in project root path
+    with open(root_path + os.sep + ".gitignore", 'w') as ignore_file:
+        ignore_file.write('.vscode/')
     # write .gitignore under build directory
     if 'build' in sub_paths:
         with open(root_path + os.sep + 'build' + os.sep + ".gitignore", 'w') as git_ignore_file:
