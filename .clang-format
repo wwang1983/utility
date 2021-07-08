@@ -5,7 +5,7 @@ Language:        Cpp
 # 访问说明符(public、private等)的偏移
 AccessModifierOffset: -4
 # 开括号(开圆括号、开尖括号、开方括号)后的对齐: Align, DontAlign, AlwaysBreak(总是在开括号后换行)
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: Align
 # 对齐所有的连续的宏定义
 AlignConsecutiveMacros: false
 # 连续赋值时，对齐所有等号
@@ -48,7 +48,7 @@ AlwaysBreakAfterReturnType: None
 # 总是在多行string字面量前换行
 AlwaysBreakBeforeMultilineStrings: true
 # 总是在template声明后换行
-AlwaysBreakTemplateDeclarations: Yes
+AlwaysBreakTemplateDeclarations: true
 # false表示函数实参要么都在同一行，要么都各自一行
 BinPackArguments: true
 # false表示所有形参要么都在同一行，要么都各自一行
@@ -194,7 +194,7 @@ ObjCBinPackProtocolList: Never
 ObjCBlockIndentWidth: 2
 ObjCBreakBeforeNestedBlockParam: true
 ObjCSpaceAfterProperty: false
-ObjCSpaceBeforeProtocolList: true
+ObjCSpaceBeforeProtocolList: false
 # 在赋值后换行的penalty
 PenaltyBreakAssignment: 2
 # 在call(后对函数调用换行的penalty
